@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { GraduationCap, BookOpen } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { GraduationCap, BookOpen, LogOut } from "lucide-react";
 
 interface HeaderProps {
-  mode: "instructor" | "student";
-  onModeChange: (mode: "instructor" | "student") => void;
+  role: "instructor" | "student";
+  userName: string;
+  onLogout: () => void;
 }
 
-export default function Header({ mode, onModeChange }: HeaderProps) {
+export default function Header({ role, userName, onLogout }: HeaderProps) {
   return (
     <header className="h-16 border-b flex items-center px-8">
       <div className="max-w-6xl mx-auto w-full flex items-center justify-between">
@@ -15,26 +17,32 @@ export default function Header({ mode, onModeChange }: HeaderProps) {
           <h1 className="text-xl font-semibold tracking-tight">True/False Quiz</h1>
         </div>
         
-        <div className="flex items-center gap-2 p-1 bg-muted rounded-lg">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {role === "instructor" ? (
+              <BookOpen className="w-4 h-4 text-muted-foreground" />
+            ) : (
+              <GraduationCap className="w-4 h-4 text-muted-foreground" />
+            )}
+            <div className="text-sm">
+              <p className="text-muted-foreground">
+                {role === "instructor" ? "Instructor" : "Student"}
+              </p>
+              <p className="font-medium" data-testid="text-user-name">
+                {userName}
+              </p>
+            </div>
+          </div>
+          
           <Button
-            data-testid="button-student-mode"
+            data-testid="button-logout"
             size="sm"
-            variant={mode === "student" ? "default" : "ghost"}
-            onClick={() => onModeChange("student")}
+            variant="outline"
+            onClick={onLogout}
             className="gap-2"
           >
-            <GraduationCap className="w-4 h-4" />
-            Student
-          </Button>
-          <Button
-            data-testid="button-instructor-mode"
-            size="sm"
-            variant={mode === "instructor" ? "default" : "ghost"}
-            onClick={() => onModeChange("instructor")}
-            className="gap-2"
-          >
-            <BookOpen className="w-4 h-4" />
-            Instructor
+            <LogOut className="w-4 h-4" />
+            Logout
           </Button>
         </div>
       </div>

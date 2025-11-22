@@ -1,16 +1,64 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Card, CardContent } from "@/components/ui/card";
 import Header from "@/components/Header";
 import InstructorView from "@/components/InstructorView";
 import StudentView from "@/components/StudentView";
+import LoginPage from "@/components/LoginPage";
 import { type Question } from "@shared/schema";
 
+// Generate a random 6-character password
+function generatePassword(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let password = '';
+  for (let i = 0; i < 6; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
+
+interface AuthState {
+  isAuthenticated: boolean;
+  role: "instructor" | "student" | null;
+  name: string;
+}
+
 function App() {
-  const [mode, setMode] = useState<"instructor" | "student">("student");
+  const instructorPassword = useMemo(() => generatePassword(), []);
+  const [authState, setAuthState] = useState<AuthState>({
+    isAuthenticated: false,
+    role: null,
+    name: "",
+  });
   const [questions, setQuestions] = useState<Question[]>([]);
+
+  // Log the instructor password to console
+  useEffect(() => {
+    console.log("=".repeat(50));
+    console.log("INSTRUCTOR PASSWORD:", instructorPassword);
+    console.log("=".repeat(50));
+  }, [instructorPassword]);
+
+  const handleLogin = (role: "instructor" | "student", name: string) => {
+    setAuthState({
+      isAuthenticated: true,
+      role,
+      name,
+    });
+    console.log(`User logged in as ${role}:`, name);
+  };
+
+  const handleLogout = () => {
+    setAuthState({
+      isAuthenticated: false,
+      role: null,
+      name: "",
+    });
+    console.log("User logged out");
+  };
 
   const handleStudentSubmit = (studentName: string, answers: Record<string, boolean>) => {
     console.log("Quiz submitted:", { studentName, answers });
@@ -20,16 +68,27 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="min-h-screen flex flex-col">
-          <Header mode={mode} onModeChange={setMode} />
-          <main className="flex-1">
-            {mode === "instructor" ? (
-              <InstructorView questions={questions} onQuestionsChange={setQuestions} />
-            ) : (
-              <StudentView questions={questions} onSubmit={handleStudentSubmit} />
-            )}
-          </main>
-        </div>
+        {!authState.isAuthenticated ? (
+          <LoginPage 
+            instructorPassword={instructorPassword}
+            onLogin={handleLogin}
+          />
+        ) : (
+          <div className="min-h-screen flex flex-col">
+            <Header 
+              role={authState.role!}
+              userName={authState.name}
+              onLogout={handleLogout}
+            />
+            <main className="flex-1">
+              {authState.role === "instructor" ? (
+                <InstructorView questions={questions} onQuestionsChange={setQuestions} />
+              ) : (
+                <StudentView questions={questions} onSubmit={handleStudentSubmit} />
+              )}
+            </main>
+          </div>
+        )}
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
