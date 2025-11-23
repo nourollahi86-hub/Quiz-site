@@ -1,24 +1,16 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Card, CardContent } from "@/components/ui/card";
 import Header from "@/components/Header";
 import InstructorView from "@/components/InstructorView";
 import StudentView from "@/components/StudentView";
 import LoginPage from "@/components/LoginPage";
 import { type Question } from "@shared/schema";
 
-// Generate a random 6-character password
-function generatePassword(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let password = '';
-  for (let i = 0; i < 6; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
-}
+// Fixed instructor password
+const INSTRUCTOR_PASSWORD = "ZQY0H4";
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -27,20 +19,12 @@ interface AuthState {
 }
 
 function App() {
-  const instructorPassword = useMemo(() => generatePassword(), []);
   const [authState, setAuthState] = useState<AuthState>({
     isAuthenticated: false,
     role: null,
     name: "",
   });
   const [questions, setQuestions] = useState<Question[]>([]);
-
-  // Log the instructor password to console
-  useEffect(() => {
-    console.log("=".repeat(50));
-    console.log("INSTRUCTOR PASSWORD:", instructorPassword);
-    console.log("=".repeat(50));
-  }, [instructorPassword]);
 
   const handleLogin = (role: "instructor" | "student", name: string) => {
     setAuthState({
@@ -70,7 +54,7 @@ function App() {
       <TooltipProvider>
         {!authState.isAuthenticated ? (
           <LoginPage 
-            instructorPassword={instructorPassword}
+            instructorPassword={INSTRUCTOR_PASSWORD}
             onLogin={handleLogin}
           />
         ) : (
@@ -84,7 +68,11 @@ function App() {
               {authState.role === "instructor" ? (
                 <InstructorView questions={questions} onQuestionsChange={setQuestions} />
               ) : (
-                <StudentView questions={questions} onSubmit={handleStudentSubmit} />
+                <StudentView 
+                  questions={questions} 
+                  onSubmit={handleStudentSubmit}
+                  studentName={authState.name}
+                />
               )}
             </main>
           </div>

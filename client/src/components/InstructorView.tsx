@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Upload, X, BookOpen } from "lucide-react";
+import { Trash2, Upload, X, BookOpen, Bold, Italic, ArrowLeftRight } from "lucide-react";
 import { type Question } from "@shared/schema";
 
 interface InstructorViewProps {
@@ -13,6 +13,8 @@ interface InstructorViewProps {
 
 export default function InstructorView({ questions, onQuestionsChange }: InstructorViewProps) {
   const [questionText, setQuestionText] = useState("");
+  const [textDirection, setTextDirection] = useState<"ltr" | "rtl">("ltr");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleUploadQuestions = () => {
     const lines = questionText.trim().split('\n').filter(line => line.trim());
@@ -37,6 +39,34 @@ export default function InstructorView({ questions, onQuestionsChange }: Instruc
     console.log("Cleared all questions");
   };
 
+  const wrapSelectedText = (wrapper: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = questionText.substring(start, end);
+
+    if (selectedText) {
+      const before = questionText.substring(0, start);
+      const after = questionText.substring(end);
+      const newText = before + wrapper + selectedText + wrapper + after;
+      setQuestionText(newText);
+
+      // Restore cursor position after the wrapper
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start + wrapper.length, end + wrapper.length);
+      }, 0);
+    }
+  };
+
+  const handleBold = () => wrapSelectedText("**");
+  const handleItalic = () => wrapSelectedText("*");
+  const handleToggleDirection = () => {
+    setTextDirection(prev => prev === "ltr" ? "rtl" : "ltr");
+  };
+
   return (
     <div className="max-w-3xl mx-auto px-8 py-12 space-y-8">
       <div>
@@ -50,12 +80,53 @@ export default function InstructorView({ questions, onQuestionsChange }: Instruc
           <CardDescription>Enter one True/False question per line</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Text Formatting Toolbar */}
+          <div className="flex items-center gap-2 p-2 border rounded-lg bg-muted/30">
+            <Button
+              data-testid="button-bold"
+              type="button"
+              size="icon"
+              variant="ghost"
+              onClick={handleBold}
+              className="h-8 w-8"
+              title="Bold (wrap selected text with **)"
+            >
+              <Bold className="w-4 h-4" />
+            </Button>
+            <Button
+              data-testid="button-italic"
+              type="button"
+              size="icon"
+              variant="ghost"
+              onClick={handleItalic}
+              className="h-8 w-8"
+              title="Italic (wrap selected text with *)"
+            >
+              <Italic className="w-4 h-4" />
+            </Button>
+            <div className="w-px h-6 bg-border mx-1" />
+            <Button
+              data-testid="button-text-direction"
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={handleToggleDirection}
+              className="gap-2 h-8"
+              title="Toggle text direction"
+            >
+              <ArrowLeftRight className="w-4 h-4" />
+              {textDirection.toUpperCase()}
+            </Button>
+          </div>
+
           <Textarea
+            ref={textareaRef}
             data-testid="textarea-questions"
             placeholder="Example:&#10;The Earth is flat.&#10;Water boils at 100°C at sea level.&#10;The sun rises in the west."
             value={questionText}
             onChange={(e) => setQuestionText(e.target.value)}
             className="min-h-64 resize-none text-base"
+            dir={textDirection}
           />
           <div className="flex gap-4">
             <Button

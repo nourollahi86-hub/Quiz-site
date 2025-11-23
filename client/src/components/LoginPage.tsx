@@ -41,22 +41,9 @@ export default function LoginPage({ instructorPassword, onLogin }: LoginPageProp
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <div className="max-w-2xl w-full">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold tracking-tight mb-2">True/False Quiz</h1>
+            <h1 className="text-4xl font-bold tracking-tight mb-2">Campbell Evaluation Exam</h1>
             <p className="text-muted-foreground">Select your role to continue</p>
           </div>
-
-          {/* Display instructor password */}
-          <Card className="mb-6 border-primary/30 bg-primary/5">
-            <CardContent className="py-4 text-center">
-              <p className="text-sm text-muted-foreground mb-2">Instructor Password</p>
-              <p className="text-2xl font-mono font-bold tracking-wider text-primary" data-testid="text-instructor-password">
-                {instructorPassword}
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                Use this password to log in as an instructor
-              </p>
-            </CardContent>
-          </Card>
 
           <div className="grid md:grid-cols-2 gap-6">
             <Card 

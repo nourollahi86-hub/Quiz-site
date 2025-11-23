@@ -1,20 +1,19 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { CheckCircle2, Send } from "lucide-react";
 import { type Question } from "@shared/schema";
 
 interface StudentViewProps {
   questions: Question[];
   onSubmit: (studentName: string, answers: Record<string, boolean>) => void;
+  studentName: string;
 }
 
-export default function StudentView({ questions, onSubmit }: StudentViewProps) {
-  const [studentName, setStudentName] = useState("");
+export default function StudentView({ questions, onSubmit, studentName }: StudentViewProps) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
 
@@ -26,11 +25,6 @@ export default function StudentView({ questions, onSubmit }: StudentViewProps) {
   };
 
   const handleSubmit = () => {
-    if (!studentName.trim()) {
-      alert("Please enter your name");
-      return;
-    }
-
     const unansweredQuestions = questions.filter(q => !answers[q.id]);
     if (unansweredQuestions.length > 0) {
       alert(`Please answer all questions. ${unansweredQuestions.length} question(s) remaining.`);
@@ -61,7 +55,6 @@ export default function StudentView({ questions, onSubmit }: StudentViewProps) {
               data-testid="button-submit-another"
               onClick={() => {
                 setSubmitted(false);
-                setStudentName("");
                 setAnswers({});
                 console.log("Ready for new submission");
               }}
@@ -92,25 +85,9 @@ export default function StudentView({ questions, onSubmit }: StudentViewProps) {
   return (
     <div className="max-w-3xl mx-auto px-8 py-12 pb-32">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold tracking-tight mb-2">True/False Quiz</h2>
+        <h2 className="text-3xl font-bold tracking-tight mb-2">Campbell Evaluation Exam</h2>
         <p className="text-muted-foreground">Answer all questions and submit when ready</p>
       </div>
-
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          <Label htmlFor="student-name" className="text-base">
-            Your Name <span className="text-destructive">*</span>
-          </Label>
-          <Input
-            id="student-name"
-            data-testid="input-student-name"
-            placeholder="Enter your full name"
-            value={studentName}
-            onChange={(e) => setStudentName(e.target.value)}
-            className="mt-2"
-          />
-        </CardContent>
-      </Card>
 
       <div className="space-y-6">
         {questions.map((question, index) => (
@@ -174,7 +151,7 @@ export default function StudentView({ questions, onSubmit }: StudentViewProps) {
             data-testid="button-submit-quiz"
             size="lg"
             onClick={handleSubmit}
-            disabled={!studentName.trim() || !allAnswered}
+            disabled={!allAnswered}
             className="gap-2 px-12"
           >
             <Send className="w-4 h-4" />
