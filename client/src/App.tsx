@@ -44,9 +44,23 @@ function App() {
     console.log("User logged out");
   };
 
-  const handleStudentSubmit = (studentName: string, answers: Record<string, boolean>) => {
-    console.log("Quiz submitted:", { studentName, answers });
-    // TODO: Send to Google Sheets via backend API
+  const handleStudentSubmit = async (studentName: string, answers: Record<string, boolean>) => {
+    try {
+      const response = await fetch("/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentName, answers }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit quiz");
+      }
+
+      console.log("Quiz submitted:", { studentName, answers });
+    } catch (error) {
+      console.error("Error submitting quiz:", error);
+      alert("Error submitting quiz. Please try again.");
+    }
   };
 
   return (

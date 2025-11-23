@@ -4,7 +4,7 @@
 
 This is an educational web application that enables instructors to create True/False quizzes and students to complete them. The platform features a simple, clean interface inspired by Linear and Notion, prioritizing clarity and efficiency for both instructors managing questions and students taking quizzes.
 
-The application uses a role-based authentication system where instructors authenticate with a randomly generated password (displayed in console), while students simply enter their name to participate. Questions are managed entirely in-memory for simplicity.
+The application uses a role-based authentication system where instructors authenticate with a fixed password ("ZQY0H4"), while students simply enter their name to participate. Questions are managed in-memory, while student responses are automatically saved to Google Sheets for instructor access and analysis.
 
 ## User Preferences
 
@@ -43,27 +43,43 @@ Preferred communication style: Simple, everyday language.
 - Production mode serves pre-built static assets from the dist/public directory
 - Both modes share the same Express application setup and route registration
 
-**API Structure**: The application currently uses in-memory storage without any HTTP API routes. The routes.ts file provides a placeholder for future API endpoints, all prefixed with `/api`.
+**API Structure**: The application uses Express routes with a `/api/submit` endpoint to handle student quiz submissions. All routes are prefixed with `/api`.
 
-**Storage Layer**: Implements an IStorage interface with a MemStorage class that maintains questions in-memory using an array. This design allows easy future migration to persistent storage (database) by implementing the same interface.
+**Storage Layer**: Implements an IStorage interface with a MemStorage class that:
+- Maintains questions in-memory using an array
+- Integrates with Google Sheets API to persist student submissions
+- Uses the appendSubmissionToSheet utility to append responses to a "Campbell Responses" spreadsheet
+- Automatically creates the Google Sheets spreadsheet if it doesn't exist
 
 **Session Management**: Infrastructure for connect-pg-simple sessions is available in dependencies but not currently implemented, as authentication is stateless and session-less.
 
 ### Data Storage Solutions
 
-**Current Implementation**: Entirely in-memory storage using the MemStorage class. Questions are stored as an array and reset on server restart.
+**Questions Storage**: In-memory storage using the MemStorage class. Questions are stored as an array and reset on server restart. Each question includes:
+- id: unique identifier
+- text: question content
+- direction: text direction (ltr/rtl) for internationalization support
+
+**Student Responses Storage**: Google Sheets integration via Replit's Google Sheets connector. Each submission is automatically appended to a "Campbell Responses" spreadsheet with columns:
+- Student Name: The name entered by the student
+- Question ID: The unique identifier of each question
+- Answer: "True" or "False" response
 
 **Schema Definition**: Uses Zod for runtime validation with defined schemas for:
-- Questions (id: string, text: string)
+- Questions (id: string, text: string, direction: "ltr" | "rtl")
 - Submissions (studentName: string, answers: Record<string, boolean>)
 
-**Future Migration Path**: Drizzle ORM is configured for PostgreSQL with the @neondatabase/serverless driver. The drizzle.config.ts file is set up to use DATABASE_URL environment variable, with migrations output to ./migrations directory. This suggests planned future migration to persistent PostgreSQL storage.
+**Google Sheets Integration**: 
+- Authenticated via Replit's connector system
+- Automatic spreadsheet creation if "Campbell Responses" doesn't exist
+- One row per answer (allows multiple rows per student for multi-question quizzes)
+- Accessible to instructors for data analysis and reporting
 
 ### Authentication and Authorization
 
 **Instructor Authentication**: 
-- Random 6-character alphanumeric password generated on application load using Math.random()
-- Password logged to console for instructor access
+- Fixed password: "ZQY0H4"
+- Password not displayed publicly; hardcoded in the application
 - No session persistence or token-based authentication
 - Password validation happens client-side during login
 
@@ -76,11 +92,16 @@ Preferred communication style: Simple, everyday language.
 
 ### External Dependencies
 
+**Google Sheets Integration**:
+- googleapis package for Google Sheets API interaction
+- Replit connector system for OAuth authentication
+- Automatic token refresh and credential management
+
 **UI Framework**:
 - Radix UI primitives (@radix-ui/*) for accessible component foundations
 - Lucide React for iconography
 - class-variance-authority and clsx for conditional styling utilities
-- TanStack Query for future API state management
+- TanStack Query for API state management
 
 **Form Handling**:
 - React Hook Form with @hookform/resolvers for form state management

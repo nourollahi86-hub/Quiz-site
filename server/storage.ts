@@ -1,4 +1,5 @@
-import { type Question } from "@shared/schema";
+import { type Question, type Submission } from "@shared/schema";
+import { appendSubmissionToSheet } from "./google-sheets";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -6,6 +7,7 @@ import { type Question } from "@shared/schema";
 export interface IStorage {
   getQuestions(): Promise<Question[]>;
   setQuestions(questions: Question[]): Promise<void>;
+  submitQuiz(submission: Submission): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -21,6 +23,11 @@ export class MemStorage implements IStorage {
 
   async setQuestions(questions: Question[]): Promise<void> {
     this.questions = questions;
+  }
+
+  async submitQuiz(submission: Submission): Promise<void> {
+    // Save to Google Sheets
+    await appendSubmissionToSheet(submission.studentName, submission.answers);
   }
 }
 
