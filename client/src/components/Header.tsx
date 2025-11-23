@@ -14,7 +14,7 @@ export default function Header({ role, userName, onLogout }: HeaderProps) {
       <div className="max-w-6xl mx-auto w-full flex items-center justify-between">
         <div className="flex items-center gap-3">
           <BookOpen className="w-6 h-6 text-primary" />
-          <h1 className="text-xl font-semibold tracking-tight">True/False Quiz</h1>
+          <h1 className="text-xl font-semibold tracking-tight">Campbell Evaluation Exam</h1>
         </div>
         
         <div className="flex items-center gap-4">
