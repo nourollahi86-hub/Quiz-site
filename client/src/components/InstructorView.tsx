@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Upload, X, BookOpen, Bold, Italic, ArrowLeftRight } from "lucide-react";
+import { Trash2, Upload, X, BookOpen, ArrowLeftRight } from "lucide-react";
 import { type Question } from "@shared/schema";
 
 interface InstructorViewProps {
@@ -41,30 +41,6 @@ export default function InstructorView({ questions, onQuestionsChange }: Instruc
     console.log("Cleared all questions");
   };
 
-  const wrapSelectedText = (wrapper: string) => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = questionText.substring(start, end);
-
-    if (selectedText) {
-      const before = questionText.substring(0, start);
-      const after = questionText.substring(end);
-      const newText = before + wrapper + selectedText + wrapper + after;
-      setQuestionText(newText);
-
-      // Restore cursor position after the wrapper
-      setTimeout(() => {
-        textarea.focus();
-        textarea.setSelectionRange(start + wrapper.length, end + wrapper.length);
-      }, 0);
-    }
-  };
-
-  const handleBold = () => wrapSelectedText("**");
-  const handleItalic = () => wrapSelectedText("*");
   const handleToggleDirection = () => {
     setTextDirection(prev => prev === "ltr" ? "rtl" : "ltr");
   };
@@ -82,31 +58,8 @@ export default function InstructorView({ questions, onQuestionsChange }: Instruc
           <CardDescription>Enter one True/False question per line</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Text Formatting Toolbar */}
+          {/* Text Direction Toolbar */}
           <div className="flex items-center gap-2 p-2 border rounded-lg bg-muted/30">
-            <Button
-              data-testid="button-bold"
-              type="button"
-              size="icon"
-              variant="ghost"
-              onClick={handleBold}
-              className="h-8 w-8"
-              title="Bold (wrap selected text with **)"
-            >
-              <Bold className="w-4 h-4" />
-            </Button>
-            <Button
-              data-testid="button-italic"
-              type="button"
-              size="icon"
-              variant="ghost"
-              onClick={handleItalic}
-              className="h-8 w-8"
-              title="Italic (wrap selected text with *)"
-            >
-              <Italic className="w-4 h-4" />
-            </Button>
-            <div className="w-px h-6 bg-border mx-1" />
             <Button
               data-testid="button-text-direction"
               type="button"
