@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GraduationCap, BookOpen, LogOut } from "lucide-react";
+import logoImage from "@assets/photo_2025-11-24_16-18-45_1763988749054.jpg";
 
 interface HeaderProps {
   role: "instructor" | "student";
@@ -13,7 +14,7 @@ export default function Header({ role, userName, onLogout }: HeaderProps) {
     <header className="h-16 border-b flex items-center px-8">
       <div className="max-w-6xl mx-auto w-full flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <BookOpen className="w-6 h-6 text-primary" />
+          <img src={logoImage} alt="Campbell Evaluation Exam" className="h-6 w-auto" />
           <h1 className="text-xl font-semibold tracking-tight">Campbell Evaluation Exam</h1>
         </div>
         
