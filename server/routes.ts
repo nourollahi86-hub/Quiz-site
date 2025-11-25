@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { submissionSchema } from "@shared/schema";
-import { appendAnswers } from "./sheets";
+import { appendAnswers } from "./google-sheets";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // put application routes here
